@@ -1,0 +1,40 @@
+# Uncomment this line to define a global platform for your project
+platform :ios, '13.0'
+
+# CocoaPods analytics
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+# Use static frameworks to avoid non-modular header issues
+use_frameworks! :linkage => :static
+use_modular_headers!
+
+# Prevent warnings
+inhibit_all_warnings!
+
+target 'Runner' do
+  # Flutter Pods are automatically handled by Flutter now
+  # No need for flutter_install_all_ios_pods
+
+  # Firebase Pods
+  pod 'Firebase/Core', :modular_headers => true
+  pod 'Firebase/Auth', :modular_headers => true
+
+  # Add other Firebase dependencies here if needed:
+  # pod 'Firebase/Firestore', :modular_headers => true
+  # pod 'Firebase/Analytics', :modular_headers => true
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      # Fix for non-modular headers
+      config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+    end
+  end
+end
