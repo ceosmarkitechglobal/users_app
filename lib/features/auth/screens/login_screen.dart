@@ -32,15 +32,20 @@ class LoginScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              const Spacer(),
-              const Icon(Icons.phone_android, size: 80, color: Colors.blue),
-              const SizedBox(height: 20),
+              Image.asset('assets/logo/Logo.png', width: 150, height: 150),
               const Text(
-                "Welcome Back!",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                "Sign Up With OTP",
+                style: TextStyle(
+                  color: Color(0xFF571094),
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
               const SizedBox(height: 10),
-              const Text("Enter your mobile number to continue"),
+              const Text(
+                "Please Enter Your Mobile Number",
+                style: TextStyle(color: Color(0xFF737373)),
+              ),
               const SizedBox(height: 30),
               TextField(
                 controller: phoneController,
@@ -61,11 +66,18 @@ class LoginScreen extends ConsumerWidget {
                             .sendOtp(phoneController.text.trim());
                       },
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF571094),
                   minimumSize: const Size(double.infinity, 50),
                 ),
                 child: authState.status == AuthStatus.loading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text("Send OTP"),
+                    : const Text(
+                        "Send OTP",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
               ),
               const Spacer(),
             ],

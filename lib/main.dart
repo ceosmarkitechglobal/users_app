@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'User App',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      initialRoute: '/',
+      initialRoute: '/logosplash',
       routes: appRoutes,
     );
   }

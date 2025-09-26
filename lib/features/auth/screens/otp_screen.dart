@@ -17,10 +17,10 @@ class OtpScreen extends ConsumerWidget {
 
     final defaultPinTheme = PinTheme(
       width: 50,
-      height: 60,
+      height: 50,
       textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.grey.shade300),
       ),
@@ -28,7 +28,6 @@ class OtpScreen extends ConsumerWidget {
 
     ref.listen<AuthState>(authProvider, (previous, next) async {
       if (next.status == AuthStatus.success && next.message == "OTP Verified") {
-        // Save login state
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
         Navigator.pushNamedAndRemoveUntil(
@@ -55,14 +54,15 @@ class OtpScreen extends ConsumerWidget {
           child: Column(
             children: [
               const Spacer(),
-              const Icon(Icons.lock, size: 80, color: Colors.blue),
-              const SizedBox(height: 20),
-              const Text(
-                "Enter OTP",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
+              //const Icon(Icons.lock, size: 80, color: Colors.blue),
+              Image.asset('assets/logo/Logo.png', width: 150, height: 150),
+              //const SizedBox(height: 20),
+              //const Text(
+              // "Enter OTP",
+              // style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              //),
               const SizedBox(height: 10),
-              Text("Enter the 6-digit code sent to $phone"),
+              Text("Enter the OTP that we had sent to \nyour number +91$phone"),
               const SizedBox(height: 30),
 
               // Pinput OTP field
@@ -74,7 +74,7 @@ class OtpScreen extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.blue),
+                    border: Border.all(color: Color(0xFF571094)),
                   ),
                 ),
                 submittedPinTheme: defaultPinTheme,
@@ -94,18 +94,28 @@ class OtpScreen extends ConsumerWidget {
                             .verifyOtp(otpController.text.trim());
                       },
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF571094),
                   minimumSize: const Size(double.infinity, 50),
                 ),
                 child: authState.status == AuthStatus.loading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text("Verify & Continue"),
+                    : const Text(
+                        "Verify OTP",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
               ),
               const SizedBox(height: 20),
               TextButton(
                 onPressed: () {
                   ref.read(authProvider.notifier).sendOtp(phone);
                 },
-                child: const Text("Didn’t receive code? Resend"),
+                child: const Text(
+                  "Didn’t receive code? Resend",
+                  style: TextStyle(color: Color(0xFF571094)),
+                ),
               ),
               const Spacer(),
             ],

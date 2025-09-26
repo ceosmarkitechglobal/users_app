@@ -5,6 +5,8 @@ class AdsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text("Ads Screen"));
+    return Scaffold(
+      appBar: AppBar(title: const Text("ADS"), centerTitle: true, elevation: 0),
+    );
   }
 }
