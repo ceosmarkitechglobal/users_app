@@ -3,14 +3,34 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:userside_app/features/auth/provider/auth_providers.dart';
 import 'otp_screen.dart';
 
-class LoginScreen extends ConsumerWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authProvider);
-    final phoneController = TextEditingController();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+}
 
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  final phoneController = TextEditingController();
+  bool _isChecked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    phoneController.addListener(() => setState(() {}));
+  }
+
+  bool get isPhoneValid {
+    final phone = phoneController.text.trim();
+    final numeric = phone.replaceAll(RegExp(r'[^0-9]'), '');
+    return phone.startsWith('+') && numeric.length >= 12;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
+    // Listen to auth changes for success/error
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next.status == AuthStatus.success &&
           next.message!.contains("OTP sent")) {
@@ -18,13 +38,15 @@ class LoginScreen extends ConsumerWidget {
           context,
           MaterialPageRoute(builder: (_) => const OtpScreen()),
         );
-      }
-      if (next.status == AuthStatus.error) {
+      } else if (next.status == AuthStatus.error) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(next.message!)));
       }
     });
+
+    final bool isEnabled = isPhoneValid && _isChecked;
+    final Color buttonColor = isEnabled ? const Color(0xFF571094) : Colors.grey;
 
     return Scaffold(
       body: SafeArea(
@@ -32,7 +54,9 @@ class LoginScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
+              Spacer(flex: 2),
               Image.asset('assets/logo/Logo.png', width: 150, height: 150),
+              const SizedBox(height: 20),
               const Text(
                 "Sign Up With OTP",
                 style: TextStyle(
@@ -50,36 +74,73 @@ class LoginScreen extends ConsumerWidget {
               TextField(
                 controller: phoneController,
                 keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(
-                  prefixText: "+91 ",
+                decoration: InputDecoration(
+                  hintText: "+91XXXXXXXXXX",
                   labelText: "Mobile Number",
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
+                  errorText: phoneController.text.isEmpty
+                      ? null
+                      : (!isPhoneValid ? "Enter valid phone number" : null),
                 ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Checkbox(
+                    value: _isChecked,
+                    activeColor: const Color(0xFF571094),
+                    onChanged: isPhoneValid
+                        ? (value) {
+                            setState(() {
+                              _isChecked = value ?? false;
+                            });
+                          }
+                        : null,
+                  ),
+                  Expanded(
+                    child: Text(
+                      "I agree to the Terms & Conditions",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isPhoneValid ? Colors.black : Colors.grey,
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: authState.status == AuthStatus.loading
-                    ? null
-                    : () {
-                        ref
-                            .read(authProvider.notifier)
-                            .sendOtp(phoneController.text.trim());
-                      },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF571094),
-                  minimumSize: const Size(double.infinity, 50),
-                ),
-                child: authState.status == AuthStatus.loading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text(
-                        "Send OTP",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed:
+                      (!isEnabled || authState.status == AuthStatus.loading)
+                      ? null
+                      : () {
+                          ref
+                              .read(authProvider.notifier)
+                              .sendOtp(phoneController.text.trim());
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: buttonColor,
+                    disabledBackgroundColor: Colors.grey,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: authState.status == AuthStatus.loading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text(
+                          "Send OTP",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 16,
+                          ),
                         ),
-                      ),
+                ),
               ),
-              const Spacer(),
+              Spacer(flex: 3),
             ],
           ),
         ),

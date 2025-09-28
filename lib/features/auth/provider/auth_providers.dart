@@ -1,12 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:userside_app/features/auth/auth_api.dart';
 
-enum AuthStatus { idle, loading, success, error }
+enum AuthStatus { initial, loading, success, error }
 
 class AuthState {
   final AuthStatus status;
   final String? message;
 
-  AuthState({this.status = AuthStatus.idle, this.message});
+  AuthState({required this.status, this.message});
+
+  factory AuthState.initial() => AuthState(status: AuthStatus.initial);
 
   AuthState copyWith({AuthStatus? status, String? message}) {
     return AuthState(
@@ -17,38 +20,55 @@ class AuthState {
 }
 
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier() : super(AuthState());
+  AuthNotifier() : super(AuthState.initial());
 
-  String? _phoneNumber;
+  String? phoneNumber;
 
-  void sendOtp(String phoneNumber) {
-    state = AuthState(status: AuthStatus.loading);
-    _phoneNumber = phoneNumber;
+  Future<void> sendOtp(String phone) async {
+    phoneNumber = phone;
+    state = state.copyWith(status: AuthStatus.loading);
 
-    // Simulate API call
-    Future.delayed(const Duration(seconds: 2), () {
-      state = AuthState(
-        status: AuthStatus.success,
-        message: "OTP sent to $phoneNumber",
-      );
-    });
-  }
-
-  void verifyOtp(String otp) {
-    state = AuthState(status: AuthStatus.loading);
-
-    Future.delayed(const Duration(seconds: 2), () {
-      if (otp == "123456") {
-        state = AuthState(status: AuthStatus.success, message: "OTP Verified");
+    try {
+      final response = await AuthApi.sendOtp(phone);
+      if (response['success'] == true) {
+        state = state.copyWith(
+          status: AuthStatus.success,
+          message: response['message'],
+        );
       } else {
-        state = AuthState(status: AuthStatus.error, message: "Invalid OTP");
+        state = state.copyWith(
+          status: AuthStatus.error,
+          message: response['message'],
+        );
       }
-    });
+    } catch (e) {
+      state = state.copyWith(status: AuthStatus.error, message: e.toString());
+    }
   }
 
-  String? get phoneNumber => _phoneNumber;
+  Future<void> verifyOtp(String otp) async {
+    if (phoneNumber == null) return;
+    state = state.copyWith(status: AuthStatus.loading);
+
+    try {
+      final response = await AuthApi.verifyOtp(phoneNumber!, otp);
+      if (response['success'] == true) {
+        state = state.copyWith(
+          status: AuthStatus.success,
+          message: "OTP Verified",
+        );
+      } else {
+        state = state.copyWith(
+          status: AuthStatus.error,
+          message: response['message'],
+        );
+      }
+    } catch (e) {
+      state = state.copyWith(status: AuthStatus.error, message: e.toString());
+    }
+  }
 }
 
-final authProvider = StateNotifierProvider<AuthNotifier, AuthState>(
-  (ref) => AuthNotifier(),
-);
+final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
+  return AuthNotifier();
+});
