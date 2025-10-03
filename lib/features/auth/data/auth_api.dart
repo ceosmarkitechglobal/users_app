@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 
 class AuthApi {
   static const String baseUrl = "";
-  //Sent OTP
   static Future<Map<String, dynamic>> sendOtp(String phone) async {
     final response = await http.post(
       Uri.parse('$baseUrl/auth/send-otp'),
@@ -13,7 +12,6 @@ class AuthApi {
     return jsonDecode(response.body);
   }
 
-  // Verify OTP
   static Future<Map<String, dynamic>> verifyOtp(
     String phone,
     String otp,

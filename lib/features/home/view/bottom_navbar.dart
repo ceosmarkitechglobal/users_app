@@ -2,22 +2,21 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:userside_app/features/wallet/view/wallet_screen.dart';
+//import 'package:shared_preferences/shared_preferences.dart';
 import '../provider/nav_provider.dart';
 import 'user_screens/home_screen.dart';
-import 'user_screens/wallet_screen.dart';
 import 'user_screens/qr_screen.dart';
 import 'user_screens/ads_screen.dart';
 
 class UserHome extends ConsumerWidget {
   const UserHome({super.key});
 
-  Future<void> _logout(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', false);
-
-    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-  }
+  //Future<void> _logout(BuildContext context) async {
+  //final prefs = await SharedPreferences.getInstance();
+  // await prefs.setBool('isLoggedIn', false);
+  // Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+  //}
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,21 +30,12 @@ class UserHome extends ConsumerWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("User Home"),
-        actions: [
-          IconButton(
-            onPressed: () => _logout(context),
-            icon: const Icon(Icons.logout),
-            tooltip: "Logout",
-          ),
-        ],
-      ),
       body: screens[currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
-        selectedItemColor: Colors.deepPurple,
+        selectedItemColor: const Color(0xFF571094),
         unselectedItemColor: Colors.grey,
+        type: BottomNavigationBarType.fixed,
         onTap: (index) => ref.read(navIndexProvider.notifier).state = index,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),

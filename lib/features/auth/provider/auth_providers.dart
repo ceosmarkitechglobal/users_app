@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:userside_app/features/auth/auth_api.dart';
+import 'package:userside_app/features/auth/data/auth_api.dart';
 
 enum AuthStatus { initial, loading, success, error }
 

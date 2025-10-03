@@ -14,9 +14,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'User App',
+      color: Colors.white,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      initialRoute: '/logosplash',
+      initialRoute: '/userHome',
       routes: appRoutes,
     );
   }
