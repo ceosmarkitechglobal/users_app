@@ -2,11 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:userside_app/features/qr_payment/view/qr_payment_screen.dart';
 import 'package:userside_app/features/wallet/view/wallet_screen.dart';
 //import 'package:shared_preferences/shared_preferences.dart';
 import '../provider/nav_provider.dart';
 import 'user_screens/home_screen.dart';
-import 'user_screens/qr_screen.dart';
 import 'user_screens/ads_screen.dart';
 
 class UserHome extends ConsumerWidget {
@@ -25,7 +25,7 @@ class UserHome extends ConsumerWidget {
     final screens = const [
       HomeScreen(),
       WalletScreen(),
-      QRScreen(),
+      QrPaymentScreen(),
       AdsScreen(),
     ];
 

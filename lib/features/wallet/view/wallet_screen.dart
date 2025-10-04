@@ -2,15 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../provider/wallet_provider.dart';
 
-class WalletScreen extends ConsumerWidget {
+class WalletScreen extends ConsumerStatefulWidget {
   const WalletScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<WalletScreen> createState() => _WalletScreenState();
+}
+
+class _WalletScreenState extends ConsumerState<WalletScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch initial balance & history
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(walletProvider.notifier).fetchWallet("user123");
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final walletState = ref.watch(walletProvider);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("My Wallet", style: TextStyle(color: Colors.white)),
+        title: const Text("My Wallet", style: TextStyle(color: Colors.white)),
         backgroundColor: const Color(0xFF571094),
       ),
       body: Padding(
@@ -24,8 +39,8 @@ class WalletScreen extends ConsumerWidget {
               elevation: 3,
               child: Container(
                 width: double.infinity,
-                height: 130,
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+                height: 135,
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -34,7 +49,7 @@ class WalletScreen extends ConsumerWidget {
                       "Wallet Balance",
                       style: TextStyle(fontSize: 16, color: Colors.grey),
                     ),
-                    //const SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     Text(
                       "₹${walletState.balance}",
                       style: const TextStyle(
@@ -47,15 +62,12 @@ class WalletScreen extends ConsumerWidget {
                 ),
               ),
             ),
-
             const SizedBox(height: 20),
-
             // Recharge Button
             ElevatedButton(
               onPressed: () async {
                 await Navigator.pushNamed(context, '/recharge');
-                // Fetch latest history and balance after returning
-                ref.read(walletProvider.notifier).fetchHistory("user123");
+                ref.read(walletProvider.notifier).fetchWallet("user123");
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF571094),
@@ -66,10 +78,7 @@ class WalletScreen extends ConsumerWidget {
                 style: TextStyle(color: Colors.white),
               ),
             ),
-
             const SizedBox(height: 20),
-
-            // Transaction History Title
             const Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -82,8 +91,6 @@ class WalletScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 10),
-
-            // Transaction List
             Expanded(
               child: walletState.loading
                   ? const Center(child: CircularProgressIndicator())
