@@ -17,31 +17,36 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   void initState() {
     super.initState();
+    // Listen for text changes to refresh button enable state
     phoneController.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    phoneController.dispose();
+    super.dispose();
   }
 
   bool get isPhoneValid {
     final phone = phoneController.text.trim();
-    final numeric = phone.replaceAll(RegExp(r'[^0-9]'), '');
-    return phone.startsWith('+') && numeric.length >= 12;
+    return RegExp(r'^[0-9]{10}$').hasMatch(phone); // Only 10 digits
   }
 
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
 
-    // Listen to auth changes for success/error
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (next.status == AuthStatus.success &&
-          next.message!.contains("OTP sent")) {
+          (next.message?.toLowerCase().contains("otp sent") ?? false)) {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const OtpScreen()),
         );
       } else if (next.status == AuthStatus.error) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(next.message!)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(next.message ?? "Something went wrong")),
+        );
       }
     });
 
@@ -54,7 +59,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              Spacer(flex: 2),
+              const Spacer(flex: 2),
               Image.asset('assets/logo/Logo.png', width: 150, height: 150),
               const SizedBox(height: 20),
               const Text(
@@ -73,14 +78,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               const SizedBox(height: 30),
               TextField(
                 controller: phoneController,
-                keyboardType: TextInputType.phone,
+                keyboardType: TextInputType.number,
+                maxLength: 10,
                 decoration: InputDecoration(
-                  hintText: "+91XXXXXXXXXX",
+                  prefixText: '+91 ',
+                  prefixStyle: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  counterText: "",
+                  hintText: "Enter 10-digit number",
                   labelText: "Mobile Number",
                   border: const OutlineInputBorder(),
                   errorText: phoneController.text.isEmpty
                       ? null
-                      : (!isPhoneValid ? "Enter valid phone number" : null),
+                      : (!isPhoneValid ? "Enter valid 10-digit number" : null),
                 ),
               ),
               const SizedBox(height: 10),
@@ -117,13 +129,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       (!isEnabled || authState.status == AuthStatus.loading)
                       ? null
                       : () {
+                          final phone = phoneController.text.trim();
+                          final formattedPhone =
+                              '+91$phone'; // ✅ Auto add country code
                           ref
                               .read(authProvider.notifier)
-                              .sendOtp(phoneController.text.trim());
+                              .sendOtp(formattedPhone);
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: buttonColor,
-                    disabledBackgroundColor: Colors.grey,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -140,7 +154,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                 ),
               ),
-              Spacer(flex: 3),
+              const Spacer(flex: 3),
             ],
           ),
         ),

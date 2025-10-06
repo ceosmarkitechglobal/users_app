@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       color: Colors.white,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      initialRoute: '/userHome',
+      initialRoute: '/logosplash',
       routes: appRoutes,
     );
   }

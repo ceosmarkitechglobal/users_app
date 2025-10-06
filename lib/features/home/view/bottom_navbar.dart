@@ -2,21 +2,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:userside_app/features/ads/view/ads_list_screen.dart';
 import 'package:userside_app/features/qr_payment/view/qr_payment_screen.dart';
 import 'package:userside_app/features/wallet/view/wallet_screen.dart';
 //import 'package:shared_preferences/shared_preferences.dart';
 import '../provider/nav_provider.dart';
 import 'user_screens/home_screen.dart';
-import 'user_screens/ads_screen.dart';
 
 class UserHome extends ConsumerWidget {
   const UserHome({super.key});
-
-  //Future<void> _logout(BuildContext context) async {
-  //final prefs = await SharedPreferences.getInstance();
-  // await prefs.setBool('isLoggedIn', false);
-  // Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-  //}
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -26,7 +20,7 @@ class UserHome extends ConsumerWidget {
       HomeScreen(),
       WalletScreen(),
       QrPaymentScreen(),
-      AdsScreen(),
+      AdsListScreen(),
     ];
 
     return Scaffold(

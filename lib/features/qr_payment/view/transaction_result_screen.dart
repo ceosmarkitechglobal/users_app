@@ -14,7 +14,7 @@ class QrResultScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Transaction Result"),
+        title: const Text("Transaction Result",style: TextStyle(color: Colors.white),),
         backgroundColor: const Color(0xFF571094),
       ),
       body: Center(
@@ -37,10 +37,8 @@ class QrResultScreen extends ConsumerWidget {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
-                  // Pop all screens until the root (main scaffold with bottom nav)
                   Navigator.popUntil(context, (route) => route.isFirst);
 
-                  // Switch to Wallet tab (assuming Wallet tab index is 1)
                   ref.read(navIndexProvider.notifier).state = 1;
                 },
                 style: ElevatedButton.styleFrom(

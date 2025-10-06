@@ -19,6 +19,7 @@ class _QrPaymentScreenState extends ConsumerState<QrPaymentScreen> {
 
   @override
   void dispose() {
+    // ignore: deprecated_member_use
     controller?.dispose();
     super.dispose();
   }
@@ -129,7 +130,10 @@ class _QrPaymentScreenState extends ConsumerState<QrPaymentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Scan Payment QR"),
+        title: const Text(
+          "Scan Payment QR",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+        ),
         backgroundColor: const Color(0xFF571094),
         iconTheme: const IconThemeData(color: Colors.white),
       ),

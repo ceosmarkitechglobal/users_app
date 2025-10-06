@@ -22,7 +22,7 @@ class _RechargeScreenState extends ConsumerState<RechargeScreen> {
       appBar: AppBar(
         title: const Text(
           "Recharge Wallet",
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
         ),
         backgroundColor: const Color(0xFF571094),
         iconTheme: const IconThemeData(color: Colors.white),
