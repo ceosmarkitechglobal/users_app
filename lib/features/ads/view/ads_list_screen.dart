@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:userside_app/features/home/provider/nav_provider.dart';
 import '../provider/ads_provider.dart';
+
+const purple = Color(0xFF571094);
 
 class AdsListScreen extends ConsumerWidget {
   const AdsListScreen({super.key});
@@ -11,12 +14,20 @@ class AdsListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            ref.read(navIndexProvider.notifier).state = 0;
+            Navigator.popUntil(context, (route) => route.isFirst);
+          },
+        ),
         title: const Text(
           "Ads",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
         ),
-        backgroundColor: const Color(0xFF571094),
-        iconTheme: const IconThemeData(color: Colors.white),
+        centerTitle: true,
       ),
       body: adsAsync.when(
         data: (ads) => ListView.builder(
@@ -24,18 +35,27 @@ class AdsListScreen extends ConsumerWidget {
           itemBuilder: (context, index) {
             final ad = ads[index];
             return Card(
-              margin: const EdgeInsets.all(10),
+              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 2,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.network(
-                    ad.imageUrl,
-                    height: 180,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(12),
+                    ),
+                    child: Image.network(
+                      ad.imageUrl,
+                      height: 180,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(10.0),
+                    padding: const EdgeInsets.all(12.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -47,18 +67,27 @@ class AdsListScreen extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(height: 4),
-                        Text(ad.description),
-                        const SizedBox(height: 6),
+                        Text(
+                          ad.description,
+                          style: const TextStyle(fontSize: 15, height: 1.4),
+                        ),
+                        const SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               ad.category,
-                              style: const TextStyle(color: Colors.grey),
+                              style: const TextStyle(
+                                color: purple,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                             Text(
                               ad.location,
-                              style: const TextStyle(color: Colors.grey),
+                              style: const TextStyle(
+                                color: purple,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ],
                         ),

@@ -1,17 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:userside_app/features/profile/view/profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-  // ignore: unused_element
-  Future<void> _logout(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', false);
-    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +16,28 @@ class HomeScreen extends StatelessWidget {
         ),
         backgroundColor: const Color(0xFF571094),
         iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: CircleAvatar(
+                radius: 20,
+                backgroundColor: Colors.white,
+                child: const Icon(
+                  Icons.person,
+                  size: 25,
+                  color: Color(0xFF571094),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: const Center(
         child: Text("Home Screen!", style: TextStyle(fontSize: 18)),

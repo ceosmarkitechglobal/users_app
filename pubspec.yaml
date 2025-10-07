@@ -42,6 +42,7 @@ dependencies:
   http: ^1.5.0
   mobile_scanner: ^7.1.2
   qr_code_scanner_plus: ^2.0.12
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

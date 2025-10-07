@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:userside_app/features/ads/view/ads_list_screen.dart';
 import 'package:userside_app/features/qr_payment/view/qr_payment_screen.dart';
+import 'package:userside_app/features/shops/view/shops_list_screen.dart';
 import 'package:userside_app/features/wallet/view/wallet_screen.dart';
 //import 'package:shared_preferences/shared_preferences.dart';
 import '../provider/nav_provider.dart';
@@ -18,8 +19,9 @@ class UserHome extends ConsumerWidget {
 
     final screens = const [
       HomeScreen(),
-      WalletScreen(),
+      ShopListScreen(),
       QrPaymentScreen(),
+      WalletScreen(),
       AdsListScreen(),
     ];
 
@@ -34,10 +36,15 @@ class UserHome extends ConsumerWidget {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: "Shop",
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.qr_code), label: "QR"),
+          BottomNavigationBarItem(
             icon: Icon(Icons.account_balance_wallet),
             label: "Wallet",
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.qr_code), label: "QR"),
+
           BottomNavigationBarItem(icon: Icon(Icons.campaign), label: "Ads"),
         ],
       ),

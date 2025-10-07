@@ -9,7 +9,7 @@ class AdsRepository {
         title: 'Mega Diwali Sale',
         description: 'Up to 60% off on all items!',
         imageUrl:
-            'https://d3jbu7vaxvlagf.cloudfront.net/small/v2/category_media/basic_img_16863173257673.jpg',
+            'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800',
         category: 'Festival',
         location: 'Mumbai',
       ),
@@ -18,7 +18,7 @@ class AdsRepository {
         title: 'Gadget Fest',
         description: 'Best prices on electronics',
         imageUrl:
-            'https://d3jbu7vaxvlagf.cloudfront.net/small/v2/category_media/basic_img_16833608561304.jpg',
+            'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800',
         category: 'Electronics',
         location: 'Delhi',
       ),
@@ -27,7 +27,7 @@ class AdsRepository {
         title: 'Mega Diwali Sale',
         description: 'Up to 60% off on all items!',
         imageUrl:
-            'https://5.imimg.com/data5/SELLER/Default/2024/7/437925870/DE/GO/HG/202005434/mobile-recharge-software-service-500x500.jpeg',
+            'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800',
         category: 'Festival',
         location: 'Mumbai',
       ),
@@ -36,7 +36,7 @@ class AdsRepository {
         title: 'Gadget Fest',
         description: 'Best prices on electronics',
         imageUrl:
-            'https://d3jbu7vaxvlagf.cloudfront.net/small/v2/category_media/image_17091993168241.jpeg',
+            'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800',
         category: 'Electronics',
         location: 'Delhi',
       ),
