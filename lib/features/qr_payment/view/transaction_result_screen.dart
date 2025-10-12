@@ -14,7 +14,10 @@ class QrResultScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Transaction Result",style: TextStyle(color: Colors.white),),
+        title: const Text(
+          "Transaction Result",
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: const Color(0xFF571094),
       ),
       body: Center(
@@ -38,9 +41,11 @@ class QrResultScreen extends ConsumerWidget {
               ElevatedButton(
                 onPressed: () {
                   Navigator.popUntil(context, (route) => route.isFirst);
-
-                  ref.read(navIndexProvider.notifier).state = 1;
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    ref.read(navIndexProvider.notifier).state = 3;
+                  });
                 },
+
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF571094),
                   minimumSize: const Size(double.infinity, 50),

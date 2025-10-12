@@ -121,7 +121,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                 length: 6,
                 defaultPinTheme: defaultPinTheme,
                 onCompleted: (pin) {
-                  ref.read(authProvider.notifier).verifyOtp(pin.trim());
+                  ref.read(authProvider.notifier).verifyOtp(pin.trim(), ref);
                 },
               ),
               const SizedBox(height: 20),
@@ -161,7 +161,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                       : () {
                           ref
                               .read(authProvider.notifier)
-                              .verifyOtp(otpController.text.trim());
+                              .verifyOtp(otpController.text.trim(), ref);
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF571094),

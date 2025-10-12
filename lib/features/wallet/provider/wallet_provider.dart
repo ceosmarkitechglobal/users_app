@@ -30,12 +30,14 @@ class WalletState {
 }
 
 class WalletNotifier extends StateNotifier<WalletState> {
-  WalletNotifier() : super(WalletState(balance: 1000, history: []));
-  Future<void> fetchWallet(String userId) async {
+  WalletNotifier() : super(WalletState(balance: 0, history: []));
+
+  /// 🔹 Fetch wallet balance + transaction history
+  Future<void> fetchWallet() async {
     state = state.copyWith(loading: true, error: null);
     try {
-      final balance = await WalletApi.getWalletBalance(userId);
-      final history = await WalletApi.getTransactionHistory(userId);
+      final balance = await WalletApi.getWalletBalance();
+      final history = await WalletApi.getTransactionHistory();
       state = state.copyWith(
         balance: balance,
         history: history,
@@ -46,20 +48,15 @@ class WalletNotifier extends StateNotifier<WalletState> {
     }
   }
 
-  Future<void> recharge(String userId, int amount) async {
+  /// 🔹 Recharge wallet
+  Future<void> recharge(int amount) async {
     state = state.copyWith(loading: true, error: null);
     try {
-      final newBalance = await WalletApi.rechargeWallet(userId, amount);
-      final newHistory = List<Map<String, dynamic>>.from(state.history)
-        ..insert(0, {
-          "type": "credit",
-          "amount": amount,
-          "date": DateTime.now().toString().split(".")[0],
-        });
-
+      final newBalance = await WalletApi.rechargeWallet(amount);
+      final history = await WalletApi.getTransactionHistory();
       state = state.copyWith(
         balance: newBalance,
-        history: newHistory,
+        history: history,
         loading: false,
       );
     } catch (e) {
@@ -67,42 +64,53 @@ class WalletNotifier extends StateNotifier<WalletState> {
     }
   }
 
-  /// Fetch wallet history
-  Future<void> fetchHistory(String userId) async {
+  /// 🔹 Make payment
+  Future<void> makePayment(int amount) async {
     state = state.copyWith(loading: true, error: null);
     try {
-      final history = await WalletApi.getTransactionHistory(userId);
+      final newBalance = await WalletApi.makePayment(amount);
+      final history = await WalletApi.getTransactionHistory();
+      state = state.copyWith(
+        balance: newBalance,
+        history: history,
+        loading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(error: e.toString(), loading: false);
+      rethrow;
+    }
+  }
+
+  /// 🔹 Apply cashback
+  Future<void> applyCashback(int cashback) async {
+    state = state.copyWith(loading: true, error: null);
+    try {
+      final newBalance = await WalletApi.applyCashback(cashback);
+      final history = await WalletApi.getTransactionHistory();
+      state = state.copyWith(
+        balance: newBalance,
+        history: history,
+        loading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(error: e.toString(), loading: false);
+      rethrow;
+    }
+  }
+
+  /// 🔹 Fetch only wallet history
+  Future<void> fetchHistory() async {
+    state = state.copyWith(loading: true, error: null);
+    try {
+      final history = await WalletApi.getTransactionHistory();
       state = state.copyWith(history: history, loading: false);
     } catch (e) {
       state = state.copyWith(error: e.toString(), loading: false);
     }
   }
-
-  /// Make payment (QR payment)
-  Future<void> makePayment(String userId, int amount) async {
-    state = state.copyWith(loading: true, error: null);
-    try {
-      final newBalance = await WalletApi.makePayment(userId, amount);
-      state = state.copyWith(balance: newBalance, loading: false);
-    } catch (e) {
-      state = state.copyWith(error: e.toString(), loading: false);
-      rethrow;
-    }
-  }
-
-  /// Apply cashback after payment
-  Future<void> applyCashback(String userId, int cashback) async {
-    state = state.copyWith(loading: true, error: null);
-    try {
-      final newBalance = await WalletApi.applyCashback(userId, cashback);
-      state = state.copyWith(balance: newBalance, loading: false);
-    } catch (e) {
-      state = state.copyWith(error: e.toString(), loading: false);
-      rethrow;
-    }
-  }
 }
 
+/// 🔹 Provider
 final walletProvider = StateNotifierProvider<WalletNotifier, WalletState>(
   (ref) => WalletNotifier(),
 );

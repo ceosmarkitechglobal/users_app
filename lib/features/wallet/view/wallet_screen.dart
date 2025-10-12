@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../provider/wallet_provider.dart';
 
 class WalletScreen extends ConsumerStatefulWidget {
@@ -13,10 +14,19 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch initial balance & history
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(walletProvider.notifier).fetchWallet("user123");
+      ref.read(walletProvider.notifier).fetchWallet();
     });
+  }
+
+  String formatDate(String? isoDate) {
+    if (isoDate == null || isoDate.isEmpty) return "";
+    try {
+      final dateTime = DateTime.parse(isoDate);
+      return DateFormat('dd MMM yyyy, hh:mm a').format(dateTime);
+    } catch (e) {
+      return isoDate;
+    }
   }
 
   @override
@@ -36,6 +46,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
+            // Wallet Balance Card
             Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -67,11 +78,12 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               ),
             ),
             const SizedBox(height: 20),
+
             // Recharge Button
             ElevatedButton(
               onPressed: () async {
                 await Navigator.pushNamed(context, '/recharge');
-                ref.read(walletProvider.notifier).fetchWallet("user123");
+                ref.read(walletProvider.notifier).fetchWallet();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF571094),
@@ -83,6 +95,7 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               ),
             ),
             const SizedBox(height: 20),
+
             const Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -95,6 +108,8 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
               ),
             ),
             const SizedBox(height: 10),
+
+            // Transaction List
             Expanded(
               child: walletState.loading
                   ? const Center(child: CircularProgressIndicator())
@@ -104,18 +119,26 @@ class _WalletScreenState extends ConsumerState<WalletScreen> {
                       itemCount: walletState.history.length,
                       itemBuilder: (context, index) {
                         final txn = walletState.history[index];
+
+                        // Null-safe
+                        final direction =
+                            txn["direction"]?.toString() ?? "credit";
+                        final type = txn["type"]?.toString() ?? "unknown";
+                        final amount = txn["amount"]?.toString() ?? "0";
+                        final date = formatDate(txn["createdAt"]?.toString());
+
                         return ListTile(
                           leading: Icon(
-                            txn["type"] == "credit"
+                            direction == "credit"
                                 ? Icons.arrow_downward
                                 : Icons.arrow_upward,
-                            color: txn["type"] == "credit"
+                            color: direction == "credit"
                                 ? Colors.green
                                 : Colors.red,
                           ),
-                          title: Text("₹${txn["amount"]}"),
-                          subtitle: Text(txn["date"]),
-                          trailing: Text(txn["type"].toUpperCase()),
+                          title: Text("₹$amount"),
+                          subtitle: Text(date),
+                          trailing: Text(type.toUpperCase()),
                         );
                       },
                     ),

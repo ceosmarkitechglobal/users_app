@@ -45,7 +45,6 @@ class _QrPaymentScreenState extends ConsumerState<QrPaymentScreen> {
         return;
       }
 
-      // Only accept UPI payment URLs
       if (!code.startsWith("upi://pay")) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -55,7 +54,7 @@ class _QrPaymentScreenState extends ConsumerState<QrPaymentScreen> {
         return;
       }
 
-      // Ask user to enter amount manually
+      // Ask user for amount
       int? amount = await _showAmountDialog();
       if (amount == null || amount <= 0) {
         _isProcessing = false;
@@ -65,14 +64,12 @@ class _QrPaymentScreenState extends ConsumerState<QrPaymentScreen> {
       String result = "Payment Failed";
 
       try {
-        // Make payment using wallet
-        await ref.read(walletProvider.notifier).makePayment("user123", amount);
+        // Make payment using wallet (no userId needed)
+        await ref.read(walletProvider.notifier).makePayment(amount);
 
-        // Apply cashback (dummy 10%)
+        // Apply cashback (10%)
         final cashback = (amount * 0.1).toInt();
-        await ref
-            .read(walletProvider.notifier)
-            .applyCashback("user123", cashback);
+        await ref.read(walletProvider.notifier).applyCashback(cashback);
 
         result = "Payment Successful\nCashback ₹$cashback added";
       } catch (e) {
@@ -81,13 +78,14 @@ class _QrPaymentScreenState extends ConsumerState<QrPaymentScreen> {
 
       if (!mounted) return;
 
-      // Navigate to result screen
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (_) => QrResultScreen(result: result, amount: amount),
         ),
       );
+
+      _isProcessing = false;
     });
   }
 

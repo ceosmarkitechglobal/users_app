@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserSplashScreen extends StatefulWidget {
@@ -11,6 +12,7 @@ class UserSplashScreen extends StatefulWidget {
 
 class _UserSplashScreenState extends State<UserSplashScreen> {
   final PageController _pageController = PageController();
+  bool _checkingAuth = true;
   int _currentPage = 0;
 
   final List<Map<String, String>> splashData = [
@@ -37,15 +39,36 @@ class _UserSplashScreenState extends State<UserSplashScreen> {
     },
   ];
 
-  Future<void> _navigateToNextScreen() async {
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthStatus();
+  }
+
+  Future<void> _checkAuthStatus() async {
+    const secureStorage = FlutterSecureStorage();
     final prefs = await SharedPreferences.getInstance();
+
+    final jwtToken = await secureStorage.read(key: 'jwt_token');
     final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
-    if (isLoggedIn) {
+    // ⏳ Wait a bit to show splash instead of instant redirect
+    await Future.delayed(const Duration(seconds: 1));
+
+    if (jwtToken != null && jwtToken.isNotEmpty) {
+      Navigator.pushReplacementNamed(context, '/userHome');
+    } else if (isLoggedIn) {
       Navigator.pushReplacementNamed(context, '/userHome');
     } else {
-      Navigator.pushReplacementNamed(context, '/login');
+      // Show onboarding slides
+      setState(() => _checkingAuth = false);
     }
+  }
+
+  Future<void> _navigateToNextScreen() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', true);
+    Navigator.pushReplacementNamed(context, '/login');
   }
 
   void _onNextPressed() {
@@ -64,11 +87,21 @@ class _UserSplashScreenState extends State<UserSplashScreen> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
+    // 🟣 Step 1: show loader while checking auth
+    if (_checkingAuth) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: Image.asset('assets/logo/Logo.png', width: 160, height: 160),
+        ),
+      );
+    }
+
+    // 🟢 Step 2: show onboarding pages only if not logged in
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // Full screen image (behind notch)
           PageView.builder(
             controller: _pageController,
             itemCount: splashData.length,
@@ -78,9 +111,7 @@ class _UserSplashScreenState extends State<UserSplashScreen> {
             itemBuilder: (context, index) => Column(
               children: [
                 Container(
-                  height:
-                      screenHeight *
-                      0.55, // slightly increased to cover top notch
+                  height: screenHeight * 0.55,
                   width: double.infinity,
                   clipBehavior: Clip.hardEdge,
                   decoration: const BoxDecoration(
@@ -92,12 +123,9 @@ class _UserSplashScreenState extends State<UserSplashScreen> {
                   child: Image.asset(
                     splashData[index]['image']!,
                     fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: double.infinity,
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.04),
-                // TITLE
                 Text(
                   splashData[index]['title']!,
                   textAlign: TextAlign.center,
@@ -108,7 +136,6 @@ class _UserSplashScreenState extends State<UserSplashScreen> {
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.01),
-                // SUBTITLE
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
                   child: Text(
@@ -124,7 +151,6 @@ class _UserSplashScreenState extends State<UserSplashScreen> {
               ],
             ),
           ),
-          // Bottom Section (dots + button) at the bottom
           SafeArea(
             child: Align(
               alignment: Alignment.bottomCenter,
@@ -136,7 +162,6 @@ class _UserSplashScreenState extends State<UserSplashScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // DOT INDICATOR
                     Row(
                       children: List.generate(
                         splashData.length,
@@ -154,8 +179,6 @@ class _UserSplashScreenState extends State<UserSplashScreen> {
                         ),
                       ),
                     ),
-
-                    // NEXT BUTTON
                     ElevatedButton(
                       onPressed: _onNextPressed,
                       style: ElevatedButton.styleFrom(
@@ -165,7 +188,7 @@ class _UserSplashScreenState extends State<UserSplashScreen> {
                         ),
                         padding: EdgeInsets.symmetric(
                           horizontal: screenWidth * 0.03,
-                          vertical: screenHeight * 0.0010,
+                          vertical: screenHeight * 0.010,
                         ),
                       ),
                       child: Text(
@@ -175,7 +198,6 @@ class _UserSplashScreenState extends State<UserSplashScreen> {
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w900,
-                          fontFamily: 'bold',
                           fontSize: screenWidth * 0.03,
                         ),
                       ),

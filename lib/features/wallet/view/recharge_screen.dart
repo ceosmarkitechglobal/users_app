@@ -27,7 +27,6 @@ class _RechargeScreenState extends ConsumerState<RechargeScreen> {
         backgroundColor: const Color(0xFF571094),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -41,20 +40,43 @@ class _RechargeScreenState extends ConsumerState<RechargeScreen> {
               ),
             ),
             const SizedBox(height: 20),
+
+            /// 🔹 Recharge Button
             ElevatedButton(
               onPressed: walletState.loading
                   ? null
                   : () async {
                       final amount =
                           int.tryParse(_amountController.text.trim()) ?? 0;
-                      if (amount > 0) {
+
+                      if (amount <= 0) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Please enter a valid amount"),
+                          ),
+                        );
+                        return;
+                      }
+
+                      try {
                         await ref
                             .read(walletProvider.notifier)
-                            .recharge("user123", amount);
-                        Navigator.pop(context);
-                      } else {
+                            .recharge(amount);
+
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Enter valid amount")),
+                          const SnackBar(
+                            content: Text("Wallet recharged successfully ✅"),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+
+                        Navigator.pop(context);
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Recharge failed: $e"),
+                            backgroundColor: Colors.red,
+                          ),
                         );
                       }
                     },
