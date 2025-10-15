@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,8 +21,8 @@ class _QrPaymentScreenState extends ConsumerState<QrPaymentScreen> {
 
   @override
   void dispose() {
-    // ignore: deprecated_member_use
     controller?.dispose();
+    _isProcessing = false;
     super.dispose();
   }
 
@@ -54,8 +56,14 @@ class _QrPaymentScreenState extends ConsumerState<QrPaymentScreen> {
         return;
       }
 
-      // Ask user for amount
+      // Pause camera while taking amount input
+      await controller?.pauseCamera();
+
       int? amount = await _showAmountDialog();
+
+      // Resume camera regardless of result
+      await controller?.resumeCamera();
+
       if (amount == null || amount <= 0) {
         _isProcessing = false;
         return;
@@ -64,10 +72,9 @@ class _QrPaymentScreenState extends ConsumerState<QrPaymentScreen> {
       String result = "Payment Failed";
 
       try {
-        // Make payment using wallet (no userId needed)
+        // Make payment
         await ref.read(walletProvider.notifier).makePayment(amount);
 
-        // Apply cashback (10%)
         final cashback = (amount * 0.1).toInt();
         await ref.read(walletProvider.notifier).applyCashback(cashback);
 
@@ -97,25 +104,59 @@ class _QrPaymentScreenState extends ConsumerState<QrPaymentScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text("Enter Amount"),
+        backgroundColor: Colors.white,
+        title: const Text(
+          "Enter Amount",
+          style: TextStyle(
+            color: Color(0xFF571094),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.number,
-          decoration: const InputDecoration(hintText: "Amount"),
+          style: const TextStyle(color: Colors.black),
+          decoration: InputDecoration(
+            hintText: "Amount",
+            hintStyle: TextStyle(color: Colors.grey[400]),
+            enabledBorder: OutlineInputBorder(
+              borderSide: const BorderSide(color: Color(0xFF571094)),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: const BorderSide(color: Color(0xFF571094), width: 2),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            filled: true,
+            fillColor: Colors.white,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context);
             },
-            child: const Text("Cancel"),
+            child: const Text(
+              "Cancel",
+              style: TextStyle(color: Color(0xFF571094)),
+            ),
           ),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF571094),
+            ),
             onPressed: () {
-              amount = int.tryParse(controller.text);
+              final parsed = int.tryParse(controller.text);
+              if (parsed == null || parsed <= 0) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Enter a valid amount")),
+                );
+                return;
+              }
+              amount = parsed;
               Navigator.pop(context);
             },
-            child: const Text("Pay"),
+            child: const Text("Pay", style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

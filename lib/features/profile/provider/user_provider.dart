@@ -10,6 +10,22 @@ final jwtTokenProvider = FutureProvider<String?>((ref) async {
   const storage = FlutterSecureStorage();
   return await storage.read(key: 'jwt_token');
 });
+final updateUserProfileProvider =
+    FutureProvider.family<bool, Map<String, dynamic>>((ref, updatedData) async {
+      final token = await ref.read(jwtTokenProvider.future);
+      if (token == null) throw Exception("Not logged in");
+
+      final response = await http.put(
+        Uri.parse("https://telugu-net-backend2.onrender.com/api/users/profile"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode(updatedData),
+      );
+
+      return response.statusCode == 200;
+    });
 
 /// ✅ Provides user profile using current token (with retry logic)
 final userProfileProvider = FutureProvider<UserModel>((ref) async {

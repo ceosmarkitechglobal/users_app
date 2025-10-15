@@ -53,23 +53,40 @@ class _ShopListScreenState extends ConsumerState<ShopListScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    "Nearby Shops",
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  ),
-                  // List/Map toggle (UI only)
-                  /* Row(
+                  Row(
                     children: [
-                      const Text("List"),
-                      const SizedBox(width: 6),
-                      Switch(
-                        value: false,
-                        onChanged: (_) {},
-                        activeThumbColor: purple,
+                      IconButton(
+                        onPressed: () {
+                          ref.read(navIndexProvider.notifier).state = 0;
+                        },
+                        icon: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: Color(0xFF571094),
+                        ),
                       ),
-                      const Text("Map"),
+                      const Text(
+                        "Nearby Shops",
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
                     ],
-                  )*/
+                  ),
+                  // (Optional) List/Map toggle - can be re-enabled later
+                  /* Row(
+      children: [
+        const Text("List"),
+        const SizedBox(width: 6),
+        Switch(
+          value: false,
+          onChanged: (_) {},
+          activeThumbColor: Color(0xFF571094),
+        ),
+        const Text("Map"),
+      ],
+    )*/
                 ],
               ),
 
